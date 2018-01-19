@@ -12,9 +12,9 @@ Joe Antony (15CO220) <br>
 #### SDN :
 Software-Defined Networking (SDN) is an emerging architecture that is dynamic, manageable, cost-effective, and adaptable, making it ideal for the high-bandwidth, dynamic nature of today’s applications. This architecture decouples the network control and forwarding functions enabling the network control to become directly programmable and the underlying infrastructure to be abstracted for applications and network services.
 
-SDN architecture :<br>
-![alt text](https://qmonnet.github.io/whirl-offload/img/misc/sdn.svg)
-
+<p align="center">
+  <img width="460" height="300" src="https://qmonnet.github.io/whirl-offload/img/misc/sdn.svg">
+</p>
 
 #### DDoS :
 A Denial-of-Service (DoS) attack is a cyber-attack where the attacker seeks to make a machine or network resource unavailable to its intended users by temporarily or indefinitely disrupting services of a host connected to the Internet. This is typically accomplished by flooding the target with superfluous requests in an attempt to overload systems.
