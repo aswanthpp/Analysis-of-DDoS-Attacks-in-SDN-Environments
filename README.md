@@ -14,8 +14,8 @@ Software-Defined Networking (SDN) is an emerging architecture that is dynamic, m
 
 <p align="center">
   <img width="460" height="300" src="https://qmonnet.github.io/whirl-offload/img/misc/sdn.svg">
-  <h4 align="center"> SDN Architecture </h4>
 </p>
+<p align="center"> SDN Architecture </p>
 
 #### DDoS :
 A Denial-of-Service (DoS) attack is a cyber-attack where the attacker seeks to make a machine or network resource unavailable to its intended users by temporarily or indefinitely disrupting services of a host connected to the Internet. This is typically accomplished by flooding the target with superfluous requests in an attempt to overload systems.
