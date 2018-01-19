@@ -14,7 +14,7 @@ Software-Defined Networking (SDN) is an emerging architecture that is dynamic, m
 
 <p align="center">
   <img width="460" height="300" src="https://qmonnet.github.io/whirl-offload/img/misc/sdn.svg">
-  ##### SDN architecture
+  <h4 align="center"> SDN Architecture </h4>
 </p>
 
 #### DDoS :
