@@ -27,16 +27,9 @@ def gendest(start, end):
     first = 10
     second =0; third =0;
     ip = ".".join([str(first),str(second),str(third),str(randrange(start,end))])
-   # print start
-   # print end
     return ip
 
-#if __name__ == '__main__':
-  #main()
-
 def main(argv):
-   # global start 
-   # global end
     print argv
     try:
         opts, args = getopt.getopt(sys.argv[1:],'s:e:',['start=','end='])
