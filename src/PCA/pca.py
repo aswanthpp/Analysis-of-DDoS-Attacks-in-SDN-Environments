@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 import math
+from numpy import linalg as LA
 
 class PCA(object):
       def covariance(x, y, dataX, dataY):
@@ -62,6 +63,12 @@ class PCA(object):
       print "\t",eigen1
       print "\t",eigen2
       
+      v = LA.eig(np.array(a1,a2,a3,a4))
+      
+      print "Eigen vector"
+      print v
+      
+      '''
       b1=a1-eigen1
       b2=a2
       b3=a3
@@ -75,6 +82,6 @@ class PCA(object):
       c4=a4-eigen2
       
       # need to calculate second eigenvector
-
+      '''
       plt.title('Principal Component Axis')
       plt.show()
