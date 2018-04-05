@@ -204,7 +204,6 @@ class l3_switch (EventMixin):
       elif event.connection.dpid not in diction:
         diction[event.connection.dpid] = {}
         diction[event.connection.dpid][event.port] = 1
-        print "ERROR"
       else:
         if event.connection.dpid in diction:
           if event.port in diction[event.connection.dpid]:
@@ -217,21 +216,16 @@ class l3_switch (EventMixin):
             print "*****************************************************************************************************************************************************************************"
           else:
             diction[event.connection.dpid][event.port] = 1
-   
-      print "\n",datetime.datetime.now(), ": printing diction ",str(diction),"\n"
-    
     
     def _timer_func ():
       global diction
       global set_Timer
-      if len(diction)==0 :
-      	print "diction empty in timer func"
       
       if set_Timer==True:
-        print datetime.datetime.now(),": calling timer fucntion now!!!!!" 
+        #print datetime.datetime.now(),": calling timer fucntion now!!!!!" 
         for k,v in diction.iteritems():
           for i,j in v.iteritems():
-            if j >=50:
+            if j >=1:
               print "_____________________________________________________________________________________________"
               print "\n",datetime.datetime.now(),"*******    DDOS DETECTED   ********"
               print "\n",str(diction)
