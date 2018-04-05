@@ -61,6 +61,20 @@ class PCA(object):
       print "\t--------------\n"
       print "\t",eigen1
       print "\t",eigen2
+      
+      b1=a1-eigen1
+      b2=a2
+      b3=a3
+      b4=a4-eigen1
+      
+      # need to calculate first eigenvector
+      
+      c1=a1-eigen2
+      c2=a2
+      c3=a3
+      c4=a4-eigen2
+      
+      # need to calculate second eigenvector
 
       plt.title('Principal Component Axis')
       plt.show()
