@@ -42,7 +42,7 @@ import itertools
 import time
 #editing
 
-from .detectionUsingEntropy import Entropy
+from .detection import Entropy
 diction = {}
 ent_obj = Entropy()   # entropy class's object
 set_Timer = False     
@@ -196,7 +196,7 @@ class l3_switch (EventMixin):
       #Timer(1, _timer_func(), recurring=True)
 
 
-      #print"\n\n*********new packetIN************"
+      print"\n\n*********new packetIN************"
       if len(diction) == 0:
         print("Empty diction ",str(event.connection.dpid), str(event.port))
         diction[event.connection.dpid] = {}
@@ -204,18 +204,17 @@ class l3_switch (EventMixin):
       elif event.connection.dpid not in diction:
         diction[event.connection.dpid] = {}
         diction[event.connection.dpid][event.port] = 1
-        #print "ERROR"
+        print "ERROR"
       else:
         if event.connection.dpid in diction:
-      # temp = diction[event.connection.dpid]
-      #print(temp)
-      #print "error check " , str(diction[event.connection.dpid][event.port])
           if event.port in diction[event.connection.dpid]:
             temp_count=0
             temp_count =diction[event.connection.dpid][event.port]
             temp_count = temp_count+1
             diction[event.connection.dpid][event.port]=temp_count
-            #print "printting dpid port number and its packet count: ",  str(event.connection.dpid), str(diction[event.connection.dpid]), str(diction[event.connection.dpid][event.port])
+            print "*****************************************************************************************************************************************************************************"
+            print "printting dpid port number and its packet count: ",  str(event.connection.dpid), str(diction[event.connection.dpid]), str(diction[event.connection.dpid][event.port])
+            print "*****************************************************************************************************************************************************************************"
           else:
             diction[event.connection.dpid][event.port] = 1
    
@@ -225,8 +224,11 @@ class l3_switch (EventMixin):
     def _timer_func ():
       global diction
       global set_Timer
+      if len(diction)==0 :
+      	print "diction empty in timer func"
+      
       if set_Timer==True:
-        #print datetime.datetime.now(),": calling timer fucntion now!!!!!" 
+        print datetime.datetime.now(),": calling timer fucntion now!!!!!" 
         for k,v in diction.iteritems():
           for i,j in v.iteritems():
             if j >=50:
@@ -236,24 +238,12 @@ class l3_switch (EventMixin):
               print "\n",datetime.datetime.now(),": BLOCKED PORT NUMBER  : ", str(i), " OF SWITCH ID: ", str(k)
               print "\n_____________________________________________________________________________________________"
 
-              #self.dropDDOS ()
+             
               dpid = k
               msg = of.ofp_packet_out(in_port=i)
-              #msg.priority=42
-              #msg.in_port = event.port
-              #po = of.ofp_packet_out(buffer_id = buffer_id, in_port = in_port)
-              core.openflow.sendToDPID(dpid,msg)
-
-              
-                
+              core.openflow.sendToDPID(dpid,msg)          
       diction={}
-    def checkDDos():
-     print "_____________________________________________________________________________________________"
-     print "\n",datetime.datetime.now(),"*******    DDOS DETECTED   ********"
-     print "\n",str(diction)
-     print "\n",datetime.datetime.now(),": BLOCKED PORT NUMBER  : ", str(i), " OF SWITCH ID: ", str(k)
-     print "\n_____________________________________________________________________________________________"
-
+    
 
     if not packet.parsed:
       log.warning("%i %i ignoring unparsed packet", dpid, inport)
@@ -273,19 +263,15 @@ class l3_switch (EventMixin):
     if isinstance(packet.next, ipv4):
       log.debug("%i %i IP %s => %s", dpid,inport,
                 packet.next.srcip,packet.next.dstip)
-      ent_obj.collectStats(event.parsed.next.dstip)#editing
+      ent_obj.statcolect(event.parsed.next.dstip)#editing
       print "\n***** Entropy Value = ",str(ent_obj.value),"*****\n"
-      #if(ent_obj.value<1) :
-       #checkDDos()
-      if ent_obj.value <0.5:
+      if ent_obj.value <1.0:
         preventing()
         if timerSet is not True:
-         Timer(2, _timer_func, recurring=True)
+         Timer(1, _timer_func, recurring=True)
          timerSet=False
       else:
         timerSet=False
-          
-
             
       # Send any waiting packets...
       self._send_lost_buffers(dpid, packet.next.srcip, packet.src, inport)
@@ -303,13 +289,7 @@ class l3_switch (EventMixin):
       else:
         log.debug("%i %i learned %s", dpid,inport,packet.next.srcip)
       self.arpTable[dpid][packet.next.srcip] = Entry(inport, packet.src)
-      #nandan: getting source ip address from the packetIn
-      #myPacketInSrcIP= packet.next.srcip
-      #myPacketInSrcEth= packet.src
-      #myPacketInDstIP= packet.next.dstip
-      #myPacketInDstEth= packet.dst
-
-      #print "switcID: "+str(dpid)+" ,Port: "+str(event.port)+" ,MAC address: "+str(myPacketInSrcEth)+" ,SrcIP: "+ str(myPacketInSrcIP)+", Dst Mac: "+str(myPacketInDstEth)+", Dst IP: "+str(myPacketInDstEth)
+      
       # Try to forward
       dstaddr = packet.next.dstip
       if dstaddr in self.arpTable[dpid]:
