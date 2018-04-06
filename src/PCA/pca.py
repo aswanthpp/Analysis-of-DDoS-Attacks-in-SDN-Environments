@@ -60,32 +60,19 @@ class PCA(object):
       #eigen2 = (a1 + a4 - math.sqrt(pow((a1 + a4), 2) - 4 * (a1 * a4 - a2 * a3))) / 2
 
       
-      #w,v = LA.eig(np.array(a1,a2,a3,a4))
-      w, v = LA.eig(np.array([[a1, a2], [a3, a4]]))
-      print "Eigen vectors:"
-      print v
+      eigenValues, eigenVector = LA.eig(np.array([[a1, a2], [a3, a4]]))
       
       print "\n\n\tEigenvalues:"
       print "\t--------------\n"
-      print "\t",w[0]
-      print "\t",w[1]
+      print "\t",eigenValues[0]
+      print "\t",eigenValues[1]
+      
+      
+      print "\n\n\tEigen vectors:"
+      print eigenVector
       
       rowFeatureVector.append(v[1])
       rowFeatureVector.append(v[0])
-      '''
-      b1=a1-eigen1
-      b2=a2
-      b3=a3
-      b4=a4-eigen1
       
-      # need to calculate first eigenvector
-      
-      c1=a1-eigen2
-      c2=a2
-      c3=a3
-      c4=a4-eigen2
-      
-      # need to calculate second eigenvector
-      '''
       plt.title('Principal Component Axis')
       plt.show()
