@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
@@ -16,7 +17,7 @@ class PCA(object):
       dataX = []
       dataY = []
       covmat = []
-
+      rowFeatureVector = []
       data = pd.read_csv('test.csv', index_col = 0)
 
       for i in range(1, len(data.x) + 1):
@@ -55,19 +56,22 @@ class PCA(object):
       a3 = covmat[2]
       a4 = covmat[3]
 
-      eigen1 = (a1 + a4 + math.sqrt(pow((a1 + a4), 2) - 4 * (a1 * a4 - a2 * a3))) / 2
-      eigen2 = (a1 + a4 - math.sqrt(pow((a1 + a4), 2) - 4 * (a1 * a4 - a2 * a3))) / 2
+      #eigen1 = (a1 + a4 + math.sqrt(pow((a1 + a4), 2) - 4 * (a1 * a4 - a2 * a3))) / 2
+      #eigen2 = (a1 + a4 - math.sqrt(pow((a1 + a4), 2) - 4 * (a1 * a4 - a2 * a3))) / 2
 
-      print "\n\n\tEigenvalues:"
-      print "\t--------------\n"
-      print "\t",eigen1
-      print "\t",eigen2
       
-      v = LA.eig(np.array(a1,a2,a3,a4))
-      
-      print "Eigen vector"
+      #w,v = LA.eig(np.array(a1,a2,a3,a4))
+      w, v = LA.eig(np.array([[a1, a2], [a3, a4]]))
+      print "Eigen vectors:"
       print v
       
+      print "\n\n\tEigenvalues:"
+      print "\t--------------\n"
+      print "\t",w[0]
+      print "\t",w[1]
+      
+      rowFeatureVector.append(v[1])
+      rowFeatureVector.append(v[0])
       '''
       b1=a1-eigen1
       b2=a2
