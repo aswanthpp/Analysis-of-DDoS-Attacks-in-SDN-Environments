@@ -16,9 +16,9 @@ from pox.lib.revent import *
 import itertools 
 import time
 
-from .detection import Entropy
+from .detectionUsingEntropy import Entropy
 from .detectionUsingPCA import PCA
- 
+
 diction = {}
 ent_obj = Entropy()   
 pca_obj = PCA()
@@ -128,9 +128,9 @@ class l3_switch (EventMixin):
             temp_count =diction[event.connection.dpid][event.port]
             temp_count = temp_count+1
             diction[event.connection.dpid][event.port]=temp_count
-            print "*****************************************************************************************************************************************************************************"
+            #print "*****************************************************************************************************************************************************************************"
             print "printing dpid port number and its packet count: ",  str(event.connection.dpid), str(diction[event.connection.dpid]), str(diction[event.connection.dpid][event.port])
-            print "*****************************************************************************************************************************************************************************"
+            #print "*****************************************************************************************************************************************************************************"
           else:
             diction[event.connection.dpid][event.port] = 1
     
@@ -168,8 +168,8 @@ class l3_switch (EventMixin):
 
     if isinstance(packet.next, ipv4):
       log.debug("%i %i IP %s => %s", dpid,inport, packet.next.srcip,packet.next.dstip)
-      pca_obj(event.parsed.next.srcip, event.parsed.next.dstip)
-      ent_obj.statcolect(event.parsed.next.dstip)
+      pca_obj.statcolect(event.parsed.next.srcip, event.parsed.next.dstip)
+      ent_obj.collectStats(event.parsed.next.dstip)
       print "\n***** Entropy Value = ",str(ent_obj.value),"*****\n"
       if ent_obj.value <1.0:
         preventing()
