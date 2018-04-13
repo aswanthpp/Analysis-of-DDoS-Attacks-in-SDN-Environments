@@ -25,9 +25,12 @@ class PCA(object):
 	  return sum
 	  
       def ipToNum(ip):
-      	  
+      	  ipNum = 0
+      	  j=0
       	  ipOctet=ip.split(".")
-      	  ipNum=(int(ipOctet[0])*pow(256,3))+ (int(ipOctet[1])*pow(256,2)) + (int(ipOctet[2])*pow(256,1)) + (int(ipOctet[3])*pow(256,0))
+      	  for i in ipOctet :
+      	   ipNum += int(i)*pow(256,3-j)
+      	   j=j+1
           return ipNum
           
       def updateMean(s,d):
@@ -37,6 +40,7 @@ class PCA(object):
 
       def collectStats(self, srcIp, dstIp):
           self.count +=1
+          print "-------------",srcIp,"---d--",dstIp
           srcIpNum=ipToNum(srcIp)
           dstIpNum=ipToNum(dstIp)
         

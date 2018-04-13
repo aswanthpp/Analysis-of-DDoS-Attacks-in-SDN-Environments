@@ -168,7 +168,7 @@ class l3_switch (EventMixin):
 
     if isinstance(packet.next, ipv4):
       log.debug("%i %i IP %s => %s", dpid,inport, packet.next.srcip,packet.next.dstip)
-      pca_obj.statcolect(event.parsed.next.srcip, event.parsed.next.dstip)
+      pca_obj.collectStats(event.parsed.next.srcip, event.parsed.next.dstip)
       ent_obj.collectStats(event.parsed.next.dstip)
       print "\n***** Entropy Value = ",str(ent_obj.value),"*****\n"
       if ent_obj.value <1.0:
