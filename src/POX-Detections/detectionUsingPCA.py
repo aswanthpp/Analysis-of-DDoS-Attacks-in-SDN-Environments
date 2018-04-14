@@ -1,8 +1,11 @@
 import numpy as np
 from numpy import linalg as LA
-
+import statsmodels.formula.api as smf
+import matplotlib.pyplot as plt
+import pandas as pd
 import math
 from pox.core import core
+import time 
 
 log = core.getLogger()
 
@@ -47,7 +50,22 @@ class PCA(object):
         
 	  self.srcIpList.append(srcIpNum)
 	  self.dstIpList.append(dstIpNum)
-	  self.updateMean(srcIpNum,dstIpNum)
+	  d={'x' : self.srcIpList,'y' : self.dstIpList}
+	  data=pd.DataFrame(data=d)
+          
+          lm = smf.ols(formula = 'y ~ x', data = data).fit()
+          xmid = self.meanSrc
+      	  X_new = pd.DataFrame({'x': [xmid]})
+          ymid = lm.predict(X_new)[0]
+	  
+	  graph = pd.DataFrame({'x': [data.x.min(), data.x.max()]})
+          preds = lm.predict(graph)
+          data.plot(kind = 'scatter', x = 'x', y = 'y')
+	  plt.plot(graph, preds, c = 'red', linewidth = 2)
+	  
+	  plt.title('Principal Component Axis')
+          plt.show()
+	 
 	  a1=covariance(self.meanSrc, self.meanSrc, self.srcIpList, self.srcIpList)
           a2=covariance(self.meanSrc, self.meanDst, self.srcIpList, self.dstIpList)
           a3=covariance(self.meanDst, self.meanSrc, self.dstIpList, self.srcIpList)

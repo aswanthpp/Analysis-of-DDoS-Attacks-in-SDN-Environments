@@ -16,11 +16,9 @@ from pox.lib.revent import *
 import itertools 
 import time
 
-from .detectionUsingEntropy import Entropy
 from .detectionUsingPCA import PCA
 
 diction = {}
-ent_obj = Entropy()   
 pca_obj = PCA()
 set_Timer = False     
 defendDDOS=False      
@@ -141,7 +139,7 @@ class l3_switch (EventMixin):
       if set_Timer==True:
         for k,v in diction.iteritems():
           for i,j in v.iteritems():
-            if j >=1:
+            if j >=5:
               print "_____________________________________________________________________________________________"
               print "\n",datetime.datetime.now(),"*******    DDOS DETECTED   ********"
               print "\n",str(diction)
@@ -169,7 +167,6 @@ class l3_switch (EventMixin):
     if isinstance(packet.next, ipv4):
       log.debug("%i %i IP %s => %s", dpid,inport, packet.next.srcip,packet.next.dstip)
       pca_obj.collectStats(event.parsed.next.srcip, event.parsed.next.dstip)
-      ent_obj.collectStats(event.parsed.next.dstip)
       print "\n***** Entropy Value = ",str(ent_obj.value),"*****\n"
       if ent_obj.value <1.0:
         preventing()
