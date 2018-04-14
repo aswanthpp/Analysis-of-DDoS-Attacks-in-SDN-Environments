@@ -1,35 +1,40 @@
 import os
 import datetime
-from pox.core import core
 import pox
+import itertools 
+import time
+import pox.openflow.libopenflow_01 as of
 
+from pox.core import core
 from pox.lib.packet.ethernet import ethernet, ETHER_BROADCAST
 from pox.lib.packet.ipv4 import ipv4
 from pox.lib.packet.arp import arp
 from pox.lib.addresses import IPAddr, EthAddr
 from pox.lib.util import str_to_bool, dpid_to_str
 from pox.lib.recoco import Timer
-
-import pox.openflow.libopenflow_01 as of
-
 from pox.lib.revent import *
-import itertools 
-import time
 
 from .detectionUsingPCA import PCA
 
-diction = {}
+
 pca_obj = PCA()
-set_Timer = False     
-defendDDOS=False      
+    
+ddosStart = False
+startPCA = 0
+endPCA =0
 
 log = core.getLogger() 
+
 FLOW_IDLE_TIMEOUT = 10   
 ARP_TIMEOUT = 60 * 2    
 MAX_BUFFERED_PER_IP = 5      
 MAX_BUFFER_TIME = 5
 
+def dpid_to_mac (dpid):
+  return EthAddr("%012x" % (dpid & 0xffFFffFFffFF,))
+
 class Entry (object):
+
   def __init__ (self, port, mac):
     self.timeout = time.time() + ARP_TIMEOUT
     self.port = port
@@ -40,6 +45,7 @@ class Entry (object):
       return (self.port,self.mac)==other
     else:
       return (self.port,self.mac)==(other.port,other.mac)
+
   def __ne__ (self, other):
     return not self.__eq__(other)
 
@@ -47,32 +53,21 @@ class Entry (object):
     if self.port == of.OFPP_NONE: return False
     return time.time() > self.timeout
 
-def dpid_to_mac (dpid):
-  return EthAddr("%012x" % (dpid & 0xffFFffFFffFF,))
-
 class l3_switch (EventMixin):
   def __init__ (self, fakeways = [], arp_for_unknowns = False, wide = False):
     self.fakeways = set(fakeways)
-
     self.wide = wide
-
     self.arp_for_unknowns = arp_for_unknowns
-
     self.outstanding_arps = {}
-
     self.lost_buffers = {}
-
     self.arpTable = {}
-
     self._expire_timer = Timer(5, self._handle_expiration, recurring=True)
-
     core.listen_to_dependencies(self)
 
   def _handle_expiration (self):
     empty = []
     for k,v in self.lost_buffers.iteritems():
       dpid,ip = k
-
       for item in list(v):
         expires_at,buffer_id,in_port = item
         if expires_at < time.time():
@@ -80,7 +75,6 @@ class l3_switch (EventMixin):
           po = of.ofp_packet_out(buffer_id = buffer_id, in_port = in_port)
           core.openflow.sendToDPID(dpid, po)
       if len(v) == 0: empty.append(k)
-  
     for k in empty:
       del self.lost_buffers[k]
 
@@ -100,56 +94,10 @@ class l3_switch (EventMixin):
     dpid = event.connection.dpid
     inport = event.port
     packet = event.parsed
-    global set_Timer
-    global defendDDOS
-    global blockPort
-    timerSet =False
-    global diction
-    def preventing():
-      global diction
-      global set_Timer
-      if not set_Timer:
-        set_Timer =True
-
-      print"\n\n*********new packetIN************"
-      if len(diction) == 0:
-        print("Empty diction ",str(event.connection.dpid), str(event.port))
-        diction[event.connection.dpid] = {}
-        diction[event.connection.dpid][event.port] = 1
-      elif event.connection.dpid not in diction:
-        diction[event.connection.dpid] = {}
-        diction[event.connection.dpid][event.port] = 1
-      else:
-        if event.connection.dpid in diction:
-          if event.port in diction[event.connection.dpid]:
-            temp_count=0
-            temp_count =diction[event.connection.dpid][event.port]
-            temp_count = temp_count+1
-            diction[event.connection.dpid][event.port]=temp_count
-            #print "*****************************************************************************************************************************************************************************"
-            print "printing dpid port number and its packet count: ",  str(event.connection.dpid), str(diction[event.connection.dpid]), str(diction[event.connection.dpid][event.port])
-            #print "*****************************************************************************************************************************************************************************"
-          else:
-            diction[event.connection.dpid][event.port] = 1
-    
-    def _timer_func ():
-      global diction
-      global set_Timer
-      
-      if set_Timer==True:
-        for k,v in diction.iteritems():
-          for i,j in v.iteritems():
-            if j >=5:
-              print "_____________________________________________________________________________________________"
-              print "\n",datetime.datetime.now(),"*******    DDOS DETECTED   ********"
-              print "\n",str(diction)
-              print "\n",datetime.datetime.now(),": BLOCKED PORT NUMBER  : ", str(i), " OF SWITCH ID: ", str(k)
-              print "\n____________________________________________________________________________________________"
-              os._exit(0)
-              dpid = k
-              msg = of.ofp_packet_out(in_port=i)
-              core.openflow.sendToDPID(dpid,msg)          
-      diction={}
+   
+    global ddosStart
+    global startPCA
+    global endPCA
     
     if not packet.parsed:
       log.warning("%i %i ignoring unparsed packet", dpid, inport)
@@ -166,16 +114,26 @@ class l3_switch (EventMixin):
 
     if isinstance(packet.next, ipv4):
       log.debug("%i %i IP %s => %s", dpid,inport, packet.next.srcip,packet.next.dstip)
+      
       pca_obj.collectStats(event.parsed.next.srcip, event.parsed.next.dstip)
-      print "\n***** Entropy Value = ",str(ent_obj.value),"*****\n"
-      if ent_obj.value <1.0:
-        preventing()
-        if timerSet is not True:
-         Timer(1, _timer_func, recurring=True)
-         timerSet=False
-      else:
-        timerSet=False
-
+      
+      print "---------SD--       = ", pca_obj.getsdDeviation() 
+      #print "---------YDist --  = ", pca_obj.getYDist() 
+      #print "--------rms --     = ",pca_obj.getRms()
+      '''
+      if(-5 < pca_obj.getYDist() < 5 and ddosStart ==False) :
+      	ddosStart=True
+      	startPCA =time.time()
+      elif(-5 < pca_obj.getYDist() < 5 and ddosStart ==True):
+       	endPCA=time.time()
+       	if(endPCA-startPCA > 3):
+       	      print "\n",datetime.datetime.now(),"*******    DDOS DETECTED   ********"
+              print "\n____________________________________________________________________________________________"
+              os._exit(0)
+      else :
+       	ddosStart=False
+      '''
+      
       self._send_lost_buffers(dpid, packet.next.srcip, packet.src, inport)
 
       if packet.next.srcip in self.arpTable[dpid]:
