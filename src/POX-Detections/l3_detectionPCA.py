@@ -19,6 +19,8 @@ from .detectionUsingPCA import PCA
 
 pca_obj = PCA()
     
+initialCount = 0    
+ddosPCACount = 0    
 ddosStart = False
 startPCA = 0
 endPCA =0
@@ -95,6 +97,8 @@ class l3_switch (EventMixin):
     inport = event.port
     packet = event.parsed
    
+    global ddosPCACount 
+    global initialCount 
     global ddosStart
     global startPCA
     global endPCA
@@ -117,22 +121,29 @@ class l3_switch (EventMixin):
       
       pca_obj.collectStats(event.parsed.next.srcip, event.parsed.next.dstip)
       
-      print "---------SD--       = ", pca_obj.getsdDeviation() 
-      #print "---------YDist --  = ", pca_obj.getYDist() 
+      #print "---------SD--       = ", pca_obj.getsdDeviation() 
       #print "--------rms --     = ",pca_obj.getRms()
-      '''
-      if(-5 < pca_obj.getYDist() < 5 and ddosStart ==False) :
-      	ddosStart=True
-      	startPCA =time.time()
-      elif(-5 < pca_obj.getYDist() < 5 and ddosStart ==True):
-       	endPCA=time.time()
-       	if(endPCA-startPCA > 3):
-       	      print "\n",datetime.datetime.now(),"*******    DDOS DETECTED   ********"
-              print "\n____________________________________________________________________________________________"
-              os._exit(0)
-      else :
-       	ddosStart=False
-      '''
+      print " deltaY : ", pca_obj.getYDist() 
+      
+      initialCount = initialCount + 1
+      if(initialCount>5):
+      	if(-1 < pca_obj.getYDist() < 1 and ddosStart ==False) :
+      		ddosStart=True
+      		ddosPCACount = 0
+      		startPCA =time.time()
+      	elif(-5 < pca_obj.getYDist() < 5 and ddosStart ==True):
+       		endPCA=time.time()
+       		ddosPCACount = ddosPCACount +1
+       		if(ddosPCACount > 8 and (endPCA - startPCA)<2): 
+       	      		print "\n____________________________________________________________________________________________"
+       	      		print "\n                                  DDOS DETECTED                                           \n"
+              		print "\n",datetime.datetime.now(),": BLOCKED PORT NUMBER  : ", event.connection.dpid , " OF SWITCH ID: ", event.port
+              		print "\n____________________________________________________________________________________________"
+              		os._exit(0)
+      	else :
+       		ddosStart=False
+       		ddosPCACount = 0
+      
       
       self._send_lost_buffers(dpid, packet.next.srcip, packet.src, inport)
 

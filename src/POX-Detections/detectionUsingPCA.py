@@ -54,8 +54,7 @@ class PCA(object):
       	  if(self.count !=0 ) :
 	  	self.meanYDist=(self.meanYDist*(self.count-1)+self.yDist)/self.count
 	 
-	  self.sqDistSum += pow((self.yDist-self.meanYDist),2)   
-	  #self.sqDistSum += pow((self.yDist),2)                    
+	  self.sqDistSum += pow((self.yDist-self.meanYDist),2)                     
 	  if(self.count-1 != 0):
 	  	self.sdDeviation=math.sqrt(self.sqDistSum/(self.count-1))
       

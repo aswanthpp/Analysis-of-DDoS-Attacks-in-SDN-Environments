@@ -111,7 +111,6 @@ class l3_switch (EventMixin):
       if not set_Timer:
         set_Timer =True
 
-      print"\n\n*********new packetIN************"
       if len(diction) == 0:
         print("Empty diction ",str(event.connection.dpid), str(event.port))
         diction[event.connection.dpid] = {}
@@ -127,7 +126,7 @@ class l3_switch (EventMixin):
             temp_count = temp_count+1
             diction[event.connection.dpid][event.port]=temp_count
             #print "*****************************************************************************************************************************************************************************"
-            print "printing dpid port number and its packet count: ",  str(event.connection.dpid), str(diction[event.connection.dpid]), str(diction[event.connection.dpid][event.port])
+            print "dpid port and its packet count: ",  str(event.connection.dpid), str(diction[event.connection.dpid]), str(diction[event.connection.dpid][event.port])
             #print "*****************************************************************************************************************************************************************************"
           else:
             diction[event.connection.dpid][event.port] = 1
@@ -141,10 +140,10 @@ class l3_switch (EventMixin):
           for i,j in v.iteritems():
             if j >=5:
               print "_____________________________________________________________________________________________"
-              print "\n",datetime.datetime.now(),"*******    DDOS DETECTED   ********"
+              print "\n                               DDOS DETECTED                                              \n"
               print "\n",str(diction)
               print "\n",datetime.datetime.now(),": BLOCKED PORT NUMBER  : ", str(i), " OF SWITCH ID: ", str(k)
-              print "\n____________________________________________________________________________________________"
+              print "\n___________________________________________________________________________________________"
               os._exit(0)
               dpid = k
               msg = of.ofp_packet_out(in_port=i)
@@ -167,7 +166,7 @@ class l3_switch (EventMixin):
     if isinstance(packet.next, ipv4):
       log.debug("%i %i IP %s => %s", dpid,inport, packet.next.srcip,packet.next.dstip)
       ent_obj.collectStats(event.parsed.next.dstip)
-      print "\n***** Entropy Value = ",str(ent_obj.value),"*****\n"
+      print "Entropy : ",str(ent_obj.value)
       if ent_obj.value <1.0:
         preventing()
         if timerSet is not True:
