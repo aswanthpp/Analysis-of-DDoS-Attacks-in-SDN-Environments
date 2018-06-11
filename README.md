@@ -30,16 +30,24 @@ components. The first principal component accounts for as much of the variabilit
 possible, and each succeeding component accounts for as much of the remaining variability as 
 possible. 
 
-### Steps to Reproduce 
+### Steps to Reproduce :
 
 Steps to reproduce along with the packages needed can be found [here](https://github.com/aswanthpp/Analysis-of-DDoS-Attacks-in-SDN-Environments/wiki/Steps-To-Reproduce) 
 
+<<<<<<< HEAD
 ### Reference 
 
 1. [A Novel DDoS Attacks Detection Scheme for SDN Environments](https://github.com/aswanthpp/Analysis-of-DDoS-Attacks-in-SDN-Environments/blob/master/reference/Base%20Paper.pdf)
 2. 
 3. 
  
+=======
+### Conclusion :
+
+Results and conclusions along with output are included in [report](https://github.com/aswanthpp/Analysis-of-DDoS-Attacks-in-SDN-Environments/tree/master/reports) 
+
+
+>>>>>>> a713301b97b4c3a550271ad46343e51420dc1e31
 ### Team : 
 Aswanth P P (15CO112) <br>
 Mohammed Ameen (15CO131) <br>
