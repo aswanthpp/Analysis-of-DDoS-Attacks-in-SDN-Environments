@@ -70,6 +70,7 @@ class PCA(object):
       def getsdDeviation(self) :
       	  self.calcSqDeviation()
       	  return self.sdDeviation
+      	  
       def getYDist(self):
       	  return self.yDist
       	  
